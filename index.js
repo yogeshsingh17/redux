@@ -41,7 +41,18 @@ import {createStore, combineReducers} from "redux";
 //     }
 // }
 
-function numberReducer(initialObject, action){
+
+/**
+ * Note
+ * For larger scale project create initialState object for each reducer separately.
+ */
+const initialState = {
+    number : 0,
+    anotherNumber : 0
+}
+
+//Reducer 1
+function numberReducer(initialObject = initialState, action){
     switch(action.type){
         case 'ADD' : {
             return {
@@ -55,16 +66,25 @@ function numberReducer(initialObject, action){
                 number : initialObject.number + action.payload
             }
         }
+        default : {
+            return initialObject;
+        }
+    }
+}
+
+//Reducer 2
+function anotherNumberReducer(initialObject = initialState, action){
+    switch(action.type){
         case 'INCREMENT' : {
             return {
                 ...initialObject,
-                number : initialObject.number + 1
+                anotherNumber : initialObject.anotherNumber + 1
             }
         }
         case 'DECREMENT' : {
             return {
                 ...initialObject,
-                number : initialObject.number -1
+                anotherNumber : initialObject.anotherNumber -1
             }
         }
         default : {
@@ -73,15 +93,21 @@ function numberReducer(initialObject, action){
     }
 }
 
-const initialState = {
-    number : 0
-}
+// Combine reducers
+const rootReducers = combineReducers({
+    number : numberReducer,                             // These are key value pairs where key is the name of the reducer and value of the reducer function.
+    anotherNumber : anotherNumberReducer
+});
 
-const store = createStore(numberReducer, initialState);
+const store = createStore(rootReducers);
 
-console.log(store); 
-console.log(store.getState());  // {number : 0} getState will return the current state of the object.
+store.subscribe(() => {
+    console.log("The state has changed", store.getState())
+})
+
+console.log("The initial state of the object is : ",store.getState());  // {number : 0} getState will return the current state of the object.
 
 // Dispatch takes an action object as an argument.
 store.dispatch({type : 'ADD', payload : 15});
-console.log(store.getState());
+store.dispatch({type : 'INCREMENT', payload : null});
+console.log("The updated state of the object is : ",store.getState());
